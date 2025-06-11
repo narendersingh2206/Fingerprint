@@ -1,6 +1,6 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
+import { tsconfigPaths } from "vite-tsconfig-paths";
 
 declare module "@remix-run/node" {
   interface Future {
@@ -24,5 +24,8 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+  },
+  build: {
+    target: "ES2022"
   }
 });
