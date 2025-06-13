@@ -8,7 +8,7 @@ import {
 import type { LinksFunction } from "@remix-run/node";
 import {
   FpjsProvider
-} from '@fingerprintjs/fingerprintjs-pro-react'
+} from '@fingerprintjs/fingerprintjs-pro-react';
 
 import "./tailwind.css";
 

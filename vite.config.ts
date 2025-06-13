@@ -1,6 +1,7 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import devtoolsJson from 'vite-plugin-devtools-json';
 
 declare module "@remix-run/node" {
   interface Future {
@@ -19,6 +20,7 @@ export default defineConfig({
         v3_lazyRouteDiscovery: true,
       },
     }),
+    devtoolsJson(),
     tsconfigPaths(),
   ],
   server: {
@@ -26,6 +28,6 @@ export default defineConfig({
     open: true,
   },
   build: {
-    target: "ES2022"    
+    target: "es2022"
   }
 });

@@ -6,7 +6,7 @@
 
 Run the dev server:
 
-```sh
+```shellscript
 npm run dev
 ```
 

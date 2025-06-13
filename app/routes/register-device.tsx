@@ -1,9 +1,18 @@
 import { ActionFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "~/components/ui/input-otp"
 import { userSession, visitorDataCookie } from "~/lib/cookies.server";
 import store from "~/store/store.server";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+
+const OTP = "112233"; // This is a placeholder for the OTP, in a real application this would be generated and sent to the user
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
     const cookieHeader = request.headers.get("Cookie");
@@ -76,6 +85,11 @@ export const action: ActionFunction = async ({ request }) => {
             },
         });
     }
+    const otp = formData.get("otp");
+    if (!otp || typeof otp !== "string" || otp.length !== 6 || !/^\d+$/.test(otp) || otp !== OTP) {
+        // If the OTP is not valid, redirect to the register device page with an error
+        return new Response("Invalid otp", { status: 400 });
+    }
 
     // Register the device
     await store.addDevice({ userId, deviceId: visitorData.visitorId });
@@ -95,16 +109,27 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function RegisterDevice() {
     const loaderData = useLoaderData<typeof loader>();
+    const actionData = useActionData<typeof action>();
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <h1 className="text-7xl text-blue-400">Register Device</h1>
-            <p className="text-black">This is the register device page of the Lebara application.</p>
-            <p className="text-black">You are seeing this page as your device is not registered with us. Would you like to register this device?</p>
+            <p className="text-black">This is the device registration page of the Lebara application.</p>
+            <p className="text-black">Your device is not registered. An One-time password has been sent to your registered number.</p>
             <Form method="POST" className="mt-4">
                 <input type="hidden" name="action" defaultValue="register-device" />
-                <input type="hidden" name="visitorData" value={loaderData.visitorData} />                
-                <Button type="submit" className="w-full">
+                <input type="hidden" name="visitorData" value={loaderData.visitorData} />
+                <InputOTP maxLength={6} name="otp" className="w-full" type="password" autoFocus>
+                    <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                        <InputOTPSlot index={2} />
+                        <InputOTPSlot index={3} />
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                </InputOTP>                
+                <Button type="submit" className="w-full mt-4">
                     Register Device
                 </Button>
             </Form>
@@ -115,6 +140,14 @@ export default function RegisterDevice() {
                     Cancel
                 </Button>
             </Form>
+            {actionData && (
+                <Alert variant="destructive" className="mt-4 max-w-md">
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>
+                        {actionData}
+                    </AlertDescription>
+                </Alert>
+            )}
         </div>
     );
 }
